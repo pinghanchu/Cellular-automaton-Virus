@@ -292,17 +292,22 @@ def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
     lifespan_sigma=Par0[17]
     n1=int(grid_size[0])
     n2=int(grid_size[1])
-    filename = "virusprods{}_virusdiff{}_ifnprods{}_ifndiff{}_ifnprob{}_virusreduct{}_isstochastic{}_initialvirus{}_{}_{}_run{}".format(virus_prods,virus_diff,ifn_prods,ifn_diff,ifn_prob,virus_reduction_factor,IsStochastic,n1,n2,virus_numb,irun)
+    s1=int(virus_size[0])
+    s2=int(virus_size[1])
+    filename = "virusprods{}_virusdiff{}_ifnprods{}_ifndiff{}_ifnprob{}_virusreduct{}_isstochastic{}_initialvirus{}_{}_{}_run{}".format(virus_prods,virus_diff,ifn_prods,ifn_diff,ifn_prob,virus_reduction_factor,IsStochastic,s1,s2,virus_numb,irun)
     Par1 = [prob_infect,virus_prod_delay, ifn_prod_delay, virus_diff,ifn_diff,virus_reduction_factor]
   
     M_infected=initial_infected(grid_size,virus_center,virus_size,virus_numb)
     M_protected=np.zeros(n1*n2).reshape(n1,n2)
     M_dead=np.zeros(n1*n2).reshape(n1,n2)
         
-    M_virus_prod = np.zeros(n1*n2).reshape(n1,n2)
-    while M_virus_prod[virus_center[0]][virus_center[1]] == 0 :
-        M_virus_prod=initial_virus_prod(grid_size,virus_prods_n,virus_prods_p)
     
+    if(s1==1 and s2==1):
+        M_virus_prod = np.zeros(n1*n2).reshape(n1,n2)
+        while M_virus_prod[virus_center[0]][virus_center[1]] == 0 :
+            M_virus_prod=initial_virus_prod(grid_size,virus_prods_n,virus_prods_p)
+    else:
+        M_virus_prod=initial_virus_prod(grid_size,virus_prods_n,virus_prods_p)
     M_ifn_prod=initial_ifn_prod(grid_size,a,ifn_prob,ifn_prods)
     M_lifespan=initial_lifespan(grid_size,lifespan_mu,lifespan_sigma)  
     
@@ -396,11 +401,12 @@ def main():
     s1=int(args[1])
     s2=int(args[2])
     virus_numb=int(args[3])
+    IsStochastic=int(args[4])
+    TotalStep = int(args[5])
 
-    TotalStep = 2000
     TotalRun = 100
     IsImage=0
-    IsStochastic=1
+    #IsStochastic=1
     n1=200
     n2=500
     grid_size=[n1,n2]
