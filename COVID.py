@@ -6,6 +6,7 @@ import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 import math
 import os
+import sys
 from os.path import exists
 import csv
 
@@ -41,7 +42,7 @@ def initial_virus_prod(grid_size,virus_prods_n,virus_prods_p):
 def initial_ifn_prod(grid_size,a,ifn_prob,ifn_prods):
     n1 = grid_size[0]
     n2 = grid_size[1]
-    M_ifn_prod = np.random.choice(a,size=n1*n2,p=[1-ifn_prob,ifn_prob]).reshape(n1,n2)*(ifn_prods/ifn_prob)
+    M_ifn_prod = np.random.choice(a,size=n1*n2,p=[1-ifn_prob,ifn_prob]).reshape(n1,n2)*(float(ifn_prods)/ifn_prob)
     M_ifn_prod = M_ifn_prod.astype(int)
     return M_ifn_prod
 
@@ -270,29 +271,30 @@ def matrix_iter_homogenous(M,Par):
     
     return Mtot
 
-def Run(irun, step, Par,IsImage=0,IsStochastic=1):
+def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
     grid_size=Par0[0]
     virus_size=Par0[1]
     virus_numb=Par0[2]
     virus_center=Par0[3]
     a=Par0[4]
     virus_prods=Par0[5]
-    virus_prods_n==Par0[6]
+    virus_prods_n=Par0[6]
     virus_prods_p=Par0[7]
     virus_diff=Par0[8]
     ifn_prods=Par0[9]
     ifn_diff=Par0[10]
     ifn_prob=Par0[11]
-    
     virus_reduction_factor=Par0[12]
     prob_infect=Par0[13]
     virus_prod_delay=Par0[14]
     ifn_prod_delay=Par0[15]
     lifespan_mu=Par0[16]
     lifespan_sigma=Par0[17]
-    filename = "virusprods{}_virusdiff{}_ifnprods{}_ifndiff{}_ifnprob{}_virusreduct{}_isstochastic{}_run{}".format(virus_prods,virus_diff,ifn_prods,ifn_diff,ifn_prob,virus_reduction_factor,IsStochastic,irun)
+    n1=int(grid_size[0])
+    n2=int(grid_size[1])
+    filename = "virusprods{}_virusdiff{}_ifnprods{}_ifndiff{}_ifnprob{}_virusreduct{}_isstochastic{}_initialvirus{}_{}_{}_run{}".format(virus_prods,virus_diff,ifn_prods,ifn_diff,ifn_prob,virus_reduction_factor,IsStochastic,n1,n2,virus_numb,irun)
     Par1 = [prob_infect,virus_prod_delay, ifn_prod_delay, virus_diff,ifn_diff,virus_reduction_factor]
-    
+  
     M_infected=initial_infected(grid_size,virus_center,virus_size,virus_numb)
     M_protected=np.zeros(n1*n2).reshape(n1,n2)
     M_dead=np.zeros(n1*n2).reshape(n1,n2)
@@ -388,50 +390,51 @@ def Run(irun, step, Par,IsImage=0,IsStochastic=1):
     return df
 
 # Loop Runs
-TotalStep = 2000
-TotalRun = 100
-IsImage=0
-IsStochastic=1
-n1=200
-n2=500
-grid_size=[n1,n2]
-s1=1
-s2=1
-virus_size=[s1,s2]
-virus_numb = 1
-x0=100
-y0=200
-virus_center=[x0,y0]
-a=[0,1]
-virus_prods=2
-virus_prods_n = 0.5
-virus_prods_p = 1-virus_prods/(virus_prods+virus_prods_n)
-virus_diff=1
-ifn_prods = [0]
-ifn_diff=5
-ifn_prob = 0.1
-virus_reduction_factor=0.5
-prob_infect = 0.2
+def main():
+    args = sys.argv[1:]
+    ifn_prods =int(args[0])
+    s1=int(args[1])
+    s2=int(args[2])
+    virus_numb=int(args[3])
 
-virus_prod_delay=12
-ifn_prod_delay=12
-lifespan_mu = 60
-lifespan_sigma = 10
-
-data = []
-for iifn_prods in ifn_prods:
+    TotalStep = 2000
+    TotalRun = 100
+    IsImage=0
+    IsStochastic=1
+    n1=200
+    n2=500
+    grid_size=[n1,n2]
+    #s1=1
+    #s2=1
+    virus_size=[s1,s2]
+    #virus_numb = 1
+    x0=100
+    y0=200
+    virus_center=[x0,y0]
+    a=[0,1]
+    virus_prods=2
+    virus_prods_n = 0.5
+    virus_prods_p = 1-virus_prods/(virus_prods+virus_prods_n)
+    virus_diff=1
     
+    ifn_diff=5
+    ifn_prob = 0.1
+    virus_reduction_factor=0.5
+    prob_infect = float(0.2)
+
+    virus_prod_delay=12
+    ifn_prod_delay=12
+    lifespan_mu = 60
+    lifespan_sigma = 10
+        
     Par0 = [grid_size,virus_size,virus_numb,virus_center,a,
-        virus_prods,virus_prods_n,virus_prods_p,virus_diff, 
-        iifn_prods, ifn_diff,ifn_prob,
-        virus_reduction_factor,prob_infect,
-        virus_prod_delay, ifn_prod_delay, 
-        lifespan_mu,lifespan_sigma]
-
-    for irun in range(84,100):
+    virus_prods,virus_prods_n,virus_prods_p,virus_diff, 
+    ifn_prods, ifn_diff,ifn_prob,
+    virus_reduction_factor,prob_infect,virus_prod_delay, 
+    ifn_prod_delay, lifespan_mu,lifespan_sigma]
+    print(Par0)
+    for irun in range(TotalRun):
         df=Run(irun,TotalStep,Par0,IsImage,IsStochastic)
-        #data.append(df)
-#dftot = pd.concat(data)
 
-
-
+if __name__ == "__main__":
+    main()
