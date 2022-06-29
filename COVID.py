@@ -242,8 +242,8 @@ def matrix_iter_homogenous(M,Par):
 
                             
                     for idx, xi in np.ndenumerate(ifnx):
-                        a = x[idx]
-                        b = y[idx]
+                        a = np.round(ifnx[idx]).astype(int)
+                        b = np.round(ifny[idx]).astype(int)
                         protprobi =protprob[idx]
                         if protprobi!=0:
                             if (a!=i or b!=j) and a>=0 and a<n1 and b>=0 and b<n2:
