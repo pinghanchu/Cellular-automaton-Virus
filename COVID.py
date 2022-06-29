@@ -217,41 +217,43 @@ def matrix_iter_homogenous(M,Par):
             else:
                 if (M_virus_prod1[i][j]>0 and M_exposure_timer[i][j] > virus_prod_delay):   
                     M_viruscell1[i][j]=1
-                    p0=np.random.choice(a=[0,1],size=M_virus_prod1[i][j],p=[1-prob_infect, prob_infect])
+                    infprob=np.random.choice(a=[0,1],size=M_virus_prod1[i][j],p=[1-prob_infect, prob_infect])
                     
-                    a1 = np.round(np.random.rand(M_virus_prod1[i][j])*n1)
-                    b1 = np.round(np.random.rand(M_virus_prod1[i][j])*n2)
-                    x = np.round(a1*p0).astype(int)
-                    y = np.round(b1*p0).astype(int)    
-                    for idx, xi in np.ndenumerate(x):
-                        a = x[idx]
-                        b = y[idx]
-                        if (a!=i or b!=j) and a>=0 and a<n1 and b>=0 and b<n2:        
-                            M_virus_contact1[a,b]=1
-                            if M_exposure_timer[a,b]<virus_prod_delay:
-                                M_exposure[a,b] = 1 + M_exposure[a,b]
-                            if M_infected[a,b]==0 and M_protected[a,b]==0 and M_dead[a,b]==0:
-                                M_infected1[a,b]=1
+                    virusx = np.round(np.random.rand(M_virus_prod1[i][j])*n1)
+                    virusy = np.round(np.random.rand(M_virus_prod1[i][j])*n2)
+                    
+                    for idx, xi in np.ndenumerate(virusx):
+                        a = np.round(virusx[idx]).astype(int)
+                        b = np.round(virusy[idx]).astype(int)
+                        infprobi = infprob[idx]
+                        if infprobi!=0:
+                            if (a!=i or b!=j) and a>=0 and a<n1 and b>=0 and b<n2:
+                                M_virus_contact1[a,b]=1
+                                if M_exposure_timer[a,b]<virus_prod_delay:
+                                    M_exposure[a,b] = 1 + M_exposure[a,b]
+                                if M_infected[a,b]==0 and M_protected[a,b]==0 and M_dead[a,b]==0:
+                                    M_infected1[a,b]=1
                             
                 if (M_ifn_prod[i][j] > 0 and M_exposure_timer[i][j] >  ifn_prod_delay):
                     M_ifncell1[i][j]=1
-                    p0=np.random.choice(a=[0,1],size=M_ifn_prod[i][j],p=[1-prob_infect, prob_infect])
-                    a1 = np.round(np.random.rand(M_ifn_prod[i][j])*n1)
-                    b1 = np.round(np.random.rand(M_ifn_prod[i][j])*n2)
-                    x = np.round(a1*p0).astype(int)
-                    y = np.round(b1*p0).astype(int)
+                    protprob=np.random.choice(a=[0,1],size=M_ifn_prod[i][j],p=[1-prob_infect, prob_infect])
+                    ifnx = np.round(np.random.rand(M_ifn_prod[i][j])*n1)
+                    ifny = np.round(np.random.rand(M_ifn_prod[i][j])*n2)
+
                             
-                    for idx, xi in np.ndenumerate(x): 
+                    for idx, xi in np.ndenumerate(ifnx):
                         a = x[idx]
                         b = y[idx]
-                        if (a!=i or b!=j) and a>=0 and a<n1 and b>=0 and b<n2:
+                        protprobi =protprob[idx]
+                        if protprobi!=0:
+                            if (a!=i or b!=j) and a>=0 and a<n1 and b>=0 and b<n2:
 
-                            M_ifn_contact1[a,b]=1
-                            if M_virus_reduction[a,b]==0:
-                                M_virus_reduction1[a,b] = 1
+                                M_ifn_contact1[a,b]=1
+                                if M_virus_reduction[a,b]==0:
+                                    M_virus_reduction1[a,b] = 1
 
-                            if M_infected[a,b]==0 and M_protected[a,b]==0 and M_dead[a,b]==0:
-                                M_protected1[a,b]=1
+                                if M_infected[a,b]==0 and M_protected[a,b]==0 and M_dead[a,b]==0:
+                                    M_protected1[a,b]=1
                                  
     # the original infected add the new infected
     M_infected = M_infected + M_infected1
