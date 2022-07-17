@@ -32,24 +32,34 @@ def initial_infected(grid_size,virus_center,virus_size,virus_numb):
         M_infected=M_infected.astype(int)
     return M_infected
 
-def initial_virus_prod(grid_size,virus_prods_n,virus_prods_p):
+def initial_virus_prod(grid_size,virus_center,virus_prods_n,virus_prods_p):
     n1 = grid_size[0]
     n2 = grid_size[1]
-    M_virus_prod = np.random.negative_binomial(virus_prods_n,virus_prods_p,n1*n2).reshape(n1,n2)
-    M_virus_prod = M_virus_prod
-    return M_virus_prod.astype(int)
+    x0 = virus_center[0]
+    y0 = virus_center[1]  
+    a_virus_prod = np.round(np.random.negative_binomial(virus_prods_n,virus_prods_p,n1*n2))
+    M_virus_prod = a_virus_prod.reshape(n1,n2)
+    M_virus_prod = M_virus_prod.astype(int)
+
+                                                    
+    return M_virus_prod
 
 def initial_ifn_prod(grid_size,a,ifn_prob,ifn_prods):
     n1 = grid_size[0]
     n2 = grid_size[1]
-    M_ifn_prod = np.random.choice(a,size=n1*n2,p=[1-ifn_prob,ifn_prob]).reshape(n1,n2)*(float(ifn_prods)/ifn_prob)
+    M_ifn_prod = np.round(np.random.choice(a,size=n1*n2,p=[1-ifn_prob,ifn_prob]).reshape(n1,n2)*(float(ifn_prods)/ifn_prob))
     M_ifn_prod = M_ifn_prod.astype(int)
     return M_ifn_prod
 
 def initial_lifespan(grid_size,lifespan_mu,lifespan_sigma):
     n1 = grid_size[0]
     n2 = grid_size[1]    
-    M_lifespan = np.random.normal(lifespan_mu,lifespan_sigma,size=n1*n2).reshape(n1,n2)
+    a_lifespan = np.round(np.random.normal(lifespan_mu,lifespan_sigma,size=n1*n2))
+    for i in range(n1*n2):
+        if a_lifespan[i]<1:
+            a_lifespan[i]=0
+   
+    M_lifespan = a_lifespan.reshape(n1,n2).astype(int)
     return M_lifespan
 
 def plotmatrix(M):
@@ -146,8 +156,8 @@ def matrix_iter_stochastic(M,Par):
                         if (x[idx]!=0 or y[idx]!=0) and a>=0 and a<n1 and b>=0 and b<n2:
                             M_ifn_contact1[a,b]=1
 
-                            if M_virus_reduction[a,b]==0:
-                                M_virus_reduction1[a,b] = 1
+                            #if M_virus_reduction[a,b]==0:
+                            M_virus_reduction1[a,b] = 1
 
                             if M_infected[a,b]==0 and M_protected[a,b]==0 and M_dead[a,b]==0:
                                 M_protected1[a,b]=1
@@ -303,13 +313,11 @@ def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
     M_protected=np.zeros(n1*n2).reshape(n1,n2)
     M_dead=np.zeros(n1*n2).reshape(n1,n2)
         
-    
+    M_virus_prod=initial_virus_prod(grid_size,virus_center,virus_prods_n,virus_prods_p)
     if(s1==1 and s2==1):
-        M_virus_prod = np.zeros(n1*n2).reshape(n1,n2)
         while M_virus_prod[virus_center[0]][virus_center[1]] == 0 :
-            M_virus_prod=initial_virus_prod(grid_size,virus_prods_n,virus_prods_p)
-    else:
-        M_virus_prod=initial_virus_prod(grid_size,virus_prods_n,virus_prods_p)
+            M_virus_prod=initial_virus_prod(grid_size,virus_center,virus_prods_n,virus_prods_p)
+
     M_ifn_prod=initial_ifn_prod(grid_size,a,ifn_prob,ifn_prods)
     M_lifespan=initial_lifespan(grid_size,lifespan_mu,lifespan_sigma)  
     
@@ -323,9 +331,9 @@ def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
     M_virus_contact = np.zeros(n1*n2).reshape(n1,n2) # cell contacting virus
  
     Mtot = [M_virus_prod,M_ifn_prod,M_infected,M_protected,M_dead,M_exposure,M_exposure_timer,M_lifespan,M_virus_reduction,M_viruscell,M_virus_contact,M_ifncell,M_ifn_contact]
-    if exists("./data/data_{}.csv".format(filename)):
-        os.remove("./data/data_{}.csv".format(filename))
-    f = open("./data/data_{}.csv".format(filename), "a")
+    if exists("./data_py/data_{}.csv".format(filename)):
+        os.remove("./data_py/data_{}.csv".format(filename))
+    f = open("./data_py/data_{}.csv".format(filename), "a")
     header=['run','step','infected','protected','dead','exposure','viruscell','viruscontact','ifncell','ifncontact','ifn_prods']
     writer = csv.writer(f)
     writer.writerow(header)
@@ -363,7 +371,7 @@ def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
             plt.imshow(M_color)
             plt.title("Red:infected; Green:exposed; Blue:protected")
             plt.text(np.round(grid_size[1]*0.9).astype(int),np.round(grid_size[0]*0.1).astype(int),'{}'.format(istep), color='red',backgroundcolor='aliceblue')
-            plt.savefig("./figure/infection_{}_{}.png".format(filename,istep))
+            plt.savefig("./figure_py/infection_{}_{}.png".format(filename,istep))
             #plt.show()
             plt.close()
           
@@ -373,7 +381,7 @@ def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
             plt.imshow(M_color)
             plt.title("Red:virus generating; Green:virus contacting; Blue:dead")
             plt.text(np.round(grid_size[1]*0.9).astype(int),np.round(grid_size[0]*0.1).astype(int),'{}'.format(istep), color='red',backgroundcolor='aliceblue')
-            plt.savefig("./figure/virus_{}_{}.png".format(filename,istep))
+            plt.savefig("./figure_py/virus_{}_{}.png".format(filename,istep))
             #plt.show()
             plt.close()
 
@@ -383,7 +391,7 @@ def Run(irun, step, Par0, IsImage=0,IsStochastic=1):
             plt.imshow(M_color)
             plt.title("Red:IFN generating; Green:IFN contacting; Blue:dead")
             plt.text(np.round(grid_size[1]*0.9).astype(int),np.round(grid_size[0]*0.1).astype(int),'{}'.format(istep), color='red',backgroundcolor='aliceblue')
-            plt.savefig("./figure/ifn_{}_{}.png".format(filename,istep))
+            plt.savefig("./figure_py/ifn_{}_{}.png".format(filename,istep))
             #plt.show()
             plt.close()
             
@@ -408,16 +416,12 @@ def main():
 
     TotalRun = 100
     IsImage=0
-    #IsStochastic=1
-    n1=200
-    n2=500
+    n1=100
+    n2=100
     grid_size=[n1,n2]
-    #s1=1
-    #s2=1
     virus_size=[s1,s2]
-    #virus_numb = 1
-    x0=100
-    y0=200
+    x0=49
+    y0=49
     virus_center=[x0,y0]
     a=[0,1]
     virus_prods=2
@@ -426,7 +430,7 @@ def main():
     virus_diff=1
     
     ifn_diff=5
-    ifn_prob = 0.1
+    ifn_prob = 0.01
     virus_reduction_factor=0.5
     prob_infect = float(0.2)
 
@@ -441,7 +445,7 @@ def main():
     virus_reduction_factor,prob_infect,virus_prod_delay, 
     ifn_prod_delay, lifespan_mu,lifespan_sigma]
     print(Par0)
-    for irun in range(TotalRun):
+    for irun in range(0,TotalRun):
         df=Run(irun,TotalStep,Par0,IsImage,IsStochastic)
 
 if __name__ == "__main__":
