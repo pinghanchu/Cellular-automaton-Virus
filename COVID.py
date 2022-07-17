@@ -412,16 +412,15 @@ def main():
     s2=int(args[2])
     virus_numb=int(args[3])
     IsStochastic=int(args[4])
-    TotalStep = int(args[5])
-
-    TotalRun = 100
-    IsImage=0
-    n1=100
-    n2=100
+    IsImage = int(args[5])
+    TotalStep = int(args[6])
+    TotalRun = int(args[7])
+    n1=200
+    n2=500
     grid_size=[n1,n2]
     virus_size=[s1,s2]
-    x0=49
-    y0=49
+    x0=100
+    y0=200
     virus_center=[x0,y0]
     a=[0,1]
     virus_prods=2
@@ -430,7 +429,7 @@ def main():
     virus_diff=1
     
     ifn_diff=5
-    ifn_prob = 0.01
+    ifn_prob = 0.1
     virus_reduction_factor=0.5
     prob_infect = float(0.2)
 
