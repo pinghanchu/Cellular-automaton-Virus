@@ -8,3 +8,5 @@ $python submit.py
 # Analysis scripts
 ## convert png's to a single gif
 PNGtoGIF.ipynb 
+## convert a gif to a mp4
+GIFtoMP4.ipynb
