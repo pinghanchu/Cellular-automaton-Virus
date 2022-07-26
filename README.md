@@ -10,3 +10,5 @@ $python submit.py
 PNGtoGIF.ipynb 
 ## convert a gif to a mp4
 GIFtoMP4.ipynb
+## make figures
+PaperFigures.ipynb
