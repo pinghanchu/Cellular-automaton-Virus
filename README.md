@@ -2,7 +2,9 @@
 $python COVID.py [ifn_prod] [s1] [s2] [vnumb] [isstochastic] [isimage] [totalstep] [totalrun]  
 
 # Submit scripts
-$python submit.py || submit jobs
+## submit jobs
+$python submit.py 
 
 # Analysis scripts
-PNGtoGIF.ipynb || convert png's to a single gif
+## convert png's to a single gif
+PNGtoGIF.ipynb 
