@@ -15,13 +15,15 @@ PaperFigures.ipynb
 
 # HIV CA Model
 ## Matlab
-nographs_multisim.m
-initialize_grid.m
-NoVirusFIP_step.m
-negbinomial.py
+nographs_multisim.m,
+initialize_grid.m,
+NoVirusFIP_step.m,
+main.m,
+makegif.m,
+
+## Radom number generator library for Matlab
+negbinomial.py,
 negbinomial.pl
-main.m
-makegif.m
 
 ## Analysis scripts
 HIV_Figures.ipynb
