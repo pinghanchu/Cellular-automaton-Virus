@@ -12,3 +12,16 @@ PNGtoGIF.ipynb
 GIFtoMP4.ipynb
 ## make figures
 PaperFigures.ipynb
+
+# HIV CA Model
+##Matlab
+nographs_multisim.m
+  -initialize_grid.m
+  -NoVirusFIP_step.m
+  -negbinomial.py
+  -negbinomial.pl
+
+main.m
+  -makegif.m
+## Analysis scripts
+HIV_Figures.ipynb
